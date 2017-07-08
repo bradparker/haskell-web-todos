@@ -1,0 +1,39 @@
+#! /usr/bin/env sh
+
+# {provider}://{user}:{password}@{host}:{port}/{dbname}
+
+provider=`echo $DATABASE_URL | grep '://' | sed 's/^\(.*\):\/\/.*/\1/'`
+url_without_provider=`echo $DATABASE_URL | sed s/"$provider:\/\/"//`
+
+# extract the user and password (if any)
+userpass=`echo $url_without_provider | grep @ | cut -d@ -f1`
+pass=`echo $userpass | grep : | cut -d: -f2`
+if [ -n "$pass" ]; then
+  user=`echo $userpass | grep : | cut -d: -f1`
+else
+  user=$userpass
+fi
+url_without_userpass=`echo $url_without_provider | sed s/"$userpass@"//`
+
+# extract the host
+hostport=`echo $url_without_userpass | cut -d/ -f1`
+port=`echo $hostport | grep : | cut -d: -f2`
+if [ -n "$port" ]; then
+    host=`echo $hostport | grep : | cut -d: -f1`
+else
+    host=$hostport
+fi
+
+dbname=`echo $url_without_userpass | sed s/"$hostport\/"//`
+
+echo "Creating $provider database ..."
+
+PGPASSWORD=$pass createdb \
+  --username=$user \
+  --host=$host \
+  --port=$port \
+  $dbname
+
+echo "Database created"
+
+exit 0

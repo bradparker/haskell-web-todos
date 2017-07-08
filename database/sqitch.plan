@@ -1,0 +1,5 @@
+%syntax-version=1.0.0
+%project=haskell-web-todos
+%uri=https://github.com/bradparker/haskell-web-todos/
+
+todos 2017-07-02T06:52:33Z root <root@moby> # Adds the Todos table.

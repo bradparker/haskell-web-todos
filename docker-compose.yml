@@ -1,0 +1,12 @@
+database:
+  image: postgres:9.5.2
+  environment:
+    - POSTGRES_PASSWORD=password
+  ports:
+    - 5432:5432
+sqitch:
+  image: docteurklein/sqitch:pgsql
+  working_dir: /database
+  volumes:
+    - ./database:/database
+  net: "host"
