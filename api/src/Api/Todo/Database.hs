@@ -1,11 +1,12 @@
-module Api.Todo.Database (
-  echo
-) where
+module Api.Todo.Database
+  ( insert
+  , findAll
+  ) where
 
 import Database.HDBC (fromSql, toSql, SqlValue)
 import Database.HDBC.PostgreSQL (Connection)
 import Database.Query (Query(..), execute)
-import Api.Todo.Model (Todo(..))
+import Api.Todo.Todo (Todo(..))
 
 type TodoQuery = Query Todo Todo
 
@@ -32,17 +33,29 @@ decode [_i, d, s, c_at, u_at] =
 baseQuery :: String -> TodoQuery
 baseQuery = Query encode decode
 
-echoSql :: String
-echoSql =
+findAllSql :: String
+findAllSql =
   "select \
-  \?::text as _id, \
-  \?::text as description, \
-  \?::int as state, \
-  \?::text as created_at, \
-  \?::text as updated_at"
+  \_id, \
+  \description, \
+  \state, \
+  \created_at, \
+  \updated_at \
+  \from todos"
 
-echoQuery :: TodoQuery
-echoQuery = baseQuery echoSql
+findAllQuery = Query id decode findAllSql
+findAll = execute findAllQuery
 
-echo :: Todo -> Connection -> IO [Todo]
-echo = execute echoQuery
+insertSql :: String
+insertSql =
+  "insert into todos \
+  \(_id, description, state, created_at, updated_at) \
+  \values \
+  \(?, ?, ?, ?, ?) \
+  \returning _id, description, state, created_at, updated_at"
+
+insertQuery :: TodoQuery
+insertQuery = baseQuery insertSql
+
+insert :: Todo -> Connection -> IO [Todo]
+insert = execute insertQuery

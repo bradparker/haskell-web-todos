@@ -1,4 +1,7 @@
-module Database.Configuration.Connection (ConnectionConfig(..)) where
+module Database.Configuration.Connection
+  ( ConnectionConfig(..)
+  , emptyConnectionConfig
+  ) where
 
 data ConnectionConfig = ConnectionConfig
   { host :: String
@@ -7,3 +10,11 @@ data ConnectionConfig = ConnectionConfig
   , password :: String
   , dbname :: String
   } deriving Show
+
+emptyConnectionConfig = ConnectionConfig
+  { host = ""
+  , port = ""
+  , user = ""
+  , password = ""
+  , dbname = ""
+  }

@@ -5,18 +5,14 @@ module Database.URL (parseDatabaseURL, asConnectionString) where
 import Database.Configuration.Connection
 import Network.URI
 
-allUntil char = takeWhile (/= char)
-allAfter char = tail . (dropWhile (/= char))
+splitOn :: Char -> String -> (String, String)
+splitOn char = fmap tail . break (== char)
 
-parseUserInfo :: [Char] -> [[Char]]
-parseUserInfo info =
-  [allUntil ':', allAfter ':'] <*> [allUntil '@' info]
+parseUserInfo :: String -> (String, String)
+parseUserInfo = splitOn ':' . takeWhile (/= '@')
 
 config :: URI -> Maybe ConnectionConfig
-config (URI
-  { uriAuthority = Nothing
-  }) = Nothing
-
+config (URI { uriAuthority = Nothing }) = Nothing
 config (URI
   { uriAuthority = (Just (URIAuth
     { uriRegName
@@ -32,10 +28,10 @@ config (URI
     , dbname = tail uriPath
     })
     where
-      [uriUser, uriPassword] = parseUserInfo uriUserInfo
+      (uriUser, uriPassword) = parseUserInfo uriUserInfo
 
 parseDatabaseURL :: String -> Maybe ConnectionConfig
-parseDatabaseURL str = parseURI str >>= config
+parseDatabaseURL = (config =<<) . parseURI
 
 asConnectionString (ConnectionConfig
   { host

@@ -18,9 +18,10 @@ library
   exposed-modules:     Api
                      , Api.Database
                      , Api.Todo
+                     , Api.Todo.CreateParams
                      , Api.Todo.Database
-                     , Api.Todo.Model
                      , Api.Todo.Routes
+                     , Api.Todo.Todo
                      , Api.Types
                      , Database
                      , Database.Configuration.Connection
@@ -29,13 +30,16 @@ library
   build-depends:       base >= 4.7 && < 5
                      , HDBC
                      , HDBC-postgresql
-                     , scotty
-                     , warp
-                     , resource-pool
+                     , aeson
+                     , iso8601-time
                      , mtl
+                     , network-uri
+                     , resource-pool
+                     , scotty
                      , text
                      , time
-                     , network-uri
+                     , uuid
+                     , warp
   default-language:    Haskell2010
 
 executable api-exe
