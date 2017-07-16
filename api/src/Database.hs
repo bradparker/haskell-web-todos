@@ -3,8 +3,6 @@
 module Database
   ( databaseConnectionPool
   , databaseConnectionPoolFromEnv
-  , connectionConfigFromEnv
-  , ConnectionConfig(..)
   ) where
 
 import Data.Pool (Pool, createPool)
@@ -12,16 +10,13 @@ import Database.HDBC (disconnect)
 import Database.HDBC.PostgreSQL (Connection, connectPostgreSQL)
 import System.Environment (lookupEnv)
 
-import Database.URL
-import Database.Configuration.Connection (ConnectionConfig, emptyConnectionConfig)
-
 databaseConnectionPool
-  connectionConfig
+  connectionUrl
   subPools
   reapTime
   maxConnections =
     createPool
-      (connectPostgreSQL (asConnectionString connectionConfig))
+      (connectPostgreSQL connectionUrl)
       disconnect
       subPools
       reapTime
@@ -31,14 +26,14 @@ databaseConnectionPoolFromEnv
   subPools
   reapTime
   maxConnections = do
-    connectionConfig <- connectionConfigFromEnv
+    connectionUrl <- connectionConfigUrlFromEnv
     databaseConnectionPool
-      connectionConfig
+      connectionUrl
       subPools
       reapTime
       maxConnections
 
-connectionConfigFromEnv :: IO (ConnectionConfig)
-connectionConfigFromEnv = do
+connectionConfigUrlFromEnv :: IO String
+connectionConfigUrlFromEnv = do
   url <- lookupEnv "DATABASE_URL"
-  return (maybe emptyConnectionConfig id (parseDatabaseURL =<< url))
+  return (maybe "" id url)
