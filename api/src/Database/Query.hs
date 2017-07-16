@@ -18,5 +18,4 @@ execute :: Query a b -> a -> H.Connection -> IO [b]
 execute (Query encode decode sql) params conn = do
   statement <- H.prepare conn sql
   results <- execThenFetch statement (encode params)
-  H.commit conn
   return (map decode results)

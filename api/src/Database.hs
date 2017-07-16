@@ -26,14 +26,13 @@ databaseConnectionPoolFromEnv
   subPools
   reapTime
   maxConnections = do
-    connectionUrl <- connectionConfigUrlFromEnv
+    connectionUrl <- connectionUrlFromEnv
     databaseConnectionPool
       connectionUrl
       subPools
       reapTime
       maxConnections
 
-connectionConfigUrlFromEnv :: IO String
-connectionConfigUrlFromEnv = do
-  url <- lookupEnv "DATABASE_URL"
-  return (maybe "" id url)
+connectionUrlFromEnv :: IO String
+connectionUrlFromEnv =
+  (maybe "" id) <$> lookupEnv "DATABASE_URL"
